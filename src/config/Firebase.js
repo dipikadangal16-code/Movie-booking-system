@@ -4,13 +4,19 @@ import { getFirestore } from "firebase/firestore"
 
 // 🔑 Your Firebase project configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyA2FoSdKvl6rOgFA-7VQASyFTiP3UOYAMs",
-    authDomain: "movie-booking-system-bc7fd.firebaseapp.com",
-    projectId: "movie-booking-system-bc7fd",
-    storageBucket: "movie-booking-system-bc7fd.firebasestorage.app",
-    messagingSenderId: "32886318918",
-    appId: "1:32886318918:web:8f4ca60d17892267f3e747",
-    measurementId: "G-ZVW43LLTGD"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 }
 
 // Initialize Firebase

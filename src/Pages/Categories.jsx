@@ -1,34 +1,68 @@
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import MovieCard from "../Components/MovieCard.jsx";
+
+const API_KEY = "80d491707d8cf7b38aa19c7ccab0952f";
+
+const categories = [
+    { id: 28, name: "Action" },
+    { id: 35, name: "Comedy" },
+    { id: 27, name: "Horror" },
+    { id: 10749, name: "Romance" },
+    { id: 878, name: "Sci-Fi" },
+    { id: 53, name: "Thriller" },
+];
 
 export default function Categories() {
-    const [movies, setMovies] = useState([])
-    const categories = ["Popular", "Top Rated", "Upcoming", "Now Playing"]
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [movies, setMovies] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("https://api.themoviedb.org/3/discover/movie?api_key=80d491707d8cf7b38aa19c7ccab0952f")
+        if (!selectedCategory) return;
+
+        fetch(
+            `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${selectedCategory}`
+        )
             .then(res => res.json())
             .then(data => setMovies(data.results || []))
-            .catch(err => console.error(err))
-    }, [])
-
-    const posterBase = "https://image.tmdb.org/t/p/w500"
+            .catch(err => console.error(err));
+    }, [selectedCategory]);
 
     return (
-        <div style={{ padding: 50 }}>
-            <h1>Categories</h1>
-            {categories.map((cat, i) => (
-                <div key={i} style={{ marginBottom: 40 }}>
-                    <h2>{cat}</h2>
-                    <div style={{ display: "flex", gap: 10, overflowX: "auto" }}>
-                        {movies.slice(0, 10).map(movie => (
-                            <div key={movie.id} style={{ width: 150, textAlign: "center" }}>
-                                <img src={posterBase + movie.poster_path} alt={movie.title} style={{ width: "100%", borderRadius: 8 }} />
-                                <p>{movie.title}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ))}
+        <div style={{ padding: 20 }}>
+            <h1 style={{ color: "#ff1493", textAlign: "center" }}>Categories</h1>
+
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+                <select
+                    value={selectedCategory}
+                    onChange={e => setSelectedCategory(e.target.value)}
+                >
+                    <option value="">--Select Category--</option>
+                    {categories.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                </select>
+            </div>
+
+            <div style={styles.grid}>
+                {movies.map(movie => (
+                    <MovieCard
+                        key={movie.id}
+                        movie={movie}
+                        onBook={() => navigate(`/movie/${movie.id}`)}
+                    />
+                ))}
+            </div>
         </div>
-    )
+    );
 }
+
+const styles = {
+    grid: {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "15px",
+        justifyContent: "center",
+    },
+};

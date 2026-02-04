@@ -1,46 +1,71 @@
-import { useForm } from "react-hook-form"
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth"
-import { auth, googleProvider, facebookProvider } from "../config/Firebase.js"
-import Cookies from "js-cookie"
-import { useNavigate, Link } from "react-router-dom"
+import { useForm } from "react-hook-form";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider, facebookProvider } from "../config/Firebase.js";
+import Cookies from "js-cookie";
+import { useNavigate, Link } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/Firebase.js"; // make sure your Firestore is imported
 
 export default function Login({ loginUpdate }) {
-  const navigate = useNavigate()
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
+  const handleRole = async (uid) => {
+    // Fetch user role from Firestore
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      Cookies.set("role", data.role || "user"); // Save role in cookie
+    } else {
+      Cookies.set("role", "user"); // default role
+    }
+  };
+
+  const onSubmit = async (data) => {
     signInWithEmailAndPassword(auth, data.email, data.password)
-      .then(userCredential => {
-        Cookies.set("uid", userCredential.user.uid)
-        Cookies.set("name", userCredential.user.displayName || "")
-        Cookies.set("token", userCredential.user.accessToken)
-        if (loginUpdate) loginUpdate()
-        navigate("/profile") // go to profile after login
-      })
-      .catch(() => alert("Invalid email or password"))
-  }
+      .then(async (userCredential) => {
+        const uid = userCredential.user.uid;
+        Cookies.set("uid", uid);
+        Cookies.set("name", userCredential.user.displayName || "");
+        Cookies.set("token", userCredential.user.accessToken);
 
-  const loginWithGoogle = () => {
+        await handleRole(uid); // set role in cookie
+
+        if (loginUpdate) loginUpdate();
+        navigate("/profile");
+      })
+      .catch(() => alert("Invalid email or password"));
+  };
+
+  const loginWithGoogle = async () => {
     signInWithPopup(auth, googleProvider)
-      .then(userCredential => {
-        Cookies.set("uid", userCredential.user.uid)
-        Cookies.set("name", userCredential.user.displayName || "")
-        Cookies.set("token", userCredential.user.accessToken)
-        if (loginUpdate) loginUpdate()
-        navigate("/profile")
-      })
-  }
+      .then(async (userCredential) => {
+        const uid = userCredential.user.uid;
+        Cookies.set("uid", uid);
+        Cookies.set("name", userCredential.user.displayName || "");
+        Cookies.set("token", userCredential.user.accessToken);
 
-  const loginWithFacebook = () => {
+        await handleRole(uid);
+
+        if (loginUpdate) loginUpdate();
+        navigate("/profile");
+      });
+  };
+
+  const loginWithFacebook = async () => {
     signInWithPopup(auth, facebookProvider)
-      .then(userCredential => {
-        Cookies.set("uid", userCredential.user.uid)
-        Cookies.set("name", userCredential.user.displayName || "")
-        Cookies.set("token", userCredential.user.accessToken)
-        if (loginUpdate) loginUpdate()
-        navigate("/profile")
-      })
-  }
+      .then(async (userCredential) => {
+        const uid = userCredential.user.uid;
+        Cookies.set("uid", uid);
+        Cookies.set("name", userCredential.user.displayName || "");
+        Cookies.set("token", userCredential.user.accessToken);
+
+        await handleRole(uid);
+
+        if (loginUpdate) loginUpdate();
+        navigate("/profile");
+      });
+  };
 
   return (
     <div style={{ padding: 20, maxWidth: 400, margin: "50px auto" }}>
@@ -63,5 +88,5 @@ export default function Login({ loginUpdate }) {
       <button onClick={loginWithGoogle} style={{ marginTop: 10, width: "100%", padding: 10 }}>Login with Google</button>
       <button onClick={loginWithFacebook} style={{ marginTop: 10, width: "100%", padding: 10 }}>Login with Facebook</button>
     </div>
-  )
+  );
 }

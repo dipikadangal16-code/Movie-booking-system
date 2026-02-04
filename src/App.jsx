@@ -13,6 +13,7 @@ import Categories from "./Pages/Categories.jsx"
 import Navbar from "./Pages/Navbar.jsx"
 import SeatMap from "./Components/SeatMap.jsx"
 
+
 export default function App() {
     return (
         <>
@@ -22,8 +23,8 @@ export default function App() {
                 <Route path="/login" element={<Login loginUpdate={() => { }} />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/seatmap/:id" element={<SeatMap />} />
-                <Route path="/contact" element={<Contact />} />
+                <Route path="/SeatMap" element={<SeatMap />} />
+                <Route path="/Contact" element={<Contact />}/>
                 <Route path="/genre" element={<Genre />} />
                 <Route path="/categories" element={<Categories />} />
             </Routes>

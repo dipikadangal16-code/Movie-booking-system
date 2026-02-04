@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore"
 
 // 🔑 Your Firebase project configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyA2FoSdKvl6rOgFA-7VQASyFTiP3UOYAMs",
+    apiKey: "import.meta.env.FIREBASE_API_KEY",
     authDomain: "movie-booking-system-bc7fd.firebaseapp.com",
     projectId: "movie-booking-system-bc7fd",
     storageBucket: "movie-booking-system-bc7fd.firebasestorage.app",

@@ -1,33 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MovieCard from "../Components/MovieCard.jsx";
+import { movies as seedMovies } from "../Seed/SeedData.js";
 
-const API_KEY = "80d491707d8cf7b38aa19c7ccab0952f";
-
-// Predefined genres with TMDb genre IDs
+// Local genres (match seedData genres)
 const genres = [
-    { id: 12, name: "Adventure" },
-    { id: 16, name: "Animation" },
-    { id: 80, name: "Crime" },
-    { id: 14, name: "Fantasy" },
-    { id: 53, name: "Thriller" },
+    "Action",
+    "Adventure",
+    "Sci-Fi",
+    "Thriller",
+    "Drama"
 ];
 
 export default function Genre() {
     const [selectedGenre, setSelectedGenre] = useState("");
-    const [movies, setMovies] = useState([]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!selectedGenre) return;
-
-        fetch(
-            `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${selectedGenre}`
+    // Filter movies locally
+    const filteredMovies = selectedGenre
+        ? seedMovies.filter(movie =>
+            movie.genre.includes(selectedGenre)
         )
-            .then(res => res.json())
-            .then(data => setMovies(data.results || []))
-            .catch(err => console.error(err));
-    }, [selectedGenre]);
+        : [];
 
     return (
         <div style={{ padding: 20 }}>
@@ -40,13 +34,13 @@ export default function Genre() {
                 >
                     <option value="">--Select Genre--</option>
                     {genres.map(g => (
-                        <option key={g.id} value={g.id}>{g.name}</option>
+                        <option key={g} value={g}>{g}</option>
                     ))}
                 </select>
             </div>
 
             <div style={styles.grid}>
-                {movies.map(movie => (
+                {filteredMovies.map(movie => (
                     <MovieCard
                         key={movie.id}
                         movie={movie}

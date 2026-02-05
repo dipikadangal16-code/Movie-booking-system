@@ -16,7 +16,7 @@ export default function Navbar() {
                 <Link style={styles.link} to="/genre">Genre</Link>
                 <Link style={styles.link} to="/contact">Contact</Link>
                 <Link to="/movies">Movies</Link>
-
+                
 
                 {isLoggedIn ? (
                     <>

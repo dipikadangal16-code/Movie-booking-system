@@ -1,26 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../config/Firebase";
+import { movies as seedMovies } from "../Seed/SeedData";
 
 export default function Movies() {
-    const [movies, setMovies] = useState([]);
     const [filter, setFilter] = useState("now_showing");
     const navigate = useNavigate();
 
-    useEffect(() => {
-        async function fetchMovies() {
-            const snapshot = await getDocs(collection(db, "movies"));
-            const list = snapshot.docs.map(d => ({
-                id: d.id,
-                ...d.data()
-            }));
-            setMovies(list);
-        }
-        fetchMovies();
-    }, []);
-
-    const filteredMovies = movies.filter(m => m.status === filter);
+    // Filter movies based on status
+    const filteredMovies = seedMovies.filter(
+        (movie) => movie.status === filter
+    );
 
     return (
         <div style={{ padding: 20 }}>
@@ -47,7 +36,7 @@ export default function Movies() {
                 {filteredMovies.length === 0 ? (
                     <p>No movies found</p>
                 ) : (
-                    filteredMovies.map(movie => (
+                    filteredMovies.map((movie) => (
                         <div
                             key={movie.id}
                             style={styles.card}

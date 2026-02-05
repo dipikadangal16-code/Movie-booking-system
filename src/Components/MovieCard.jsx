@@ -1,27 +1,30 @@
 import { Link } from "react-router-dom";
 
 export default function MovieCard({ movie, onBook }) {
+    // For seeded movies, prepend TMDb base if poster_path starts with '/'
     const posterBase = "https://image.tmdb.org/t/p/w500";
-
-    // Ensure numeric TMDb ID for API
-    const tmdbId = movie.id.toString().replace("movie_", "");
+    const poster = movie.poster_path.startsWith("/")
+        ? posterBase + movie.poster_path
+        : movie.poster_path;
 
     return (
         <div style={styles.card}>
             {/* Clicking poster goes to MovieDetails page */}
-            <Link to={`/movie/${tmdbId}`}>
+            <Link to={`/movie/${movie.id}`}>
                 <img
-                    src={movie.poster_path ? posterBase + movie.poster_path : ""}
+                    src={poster}
                     alt={movie.title}
                     style={styles.img}
                 />
             </Link>
 
             <h3>{movie.title}</h3>
-            <p>{movie.release_date}</p>
+            <p>{movie.release_date || "2026-01-01"}</p>
 
-            {/* Optional: Book Now button */}
-            <button style={styles.button} onClick={onBook}>Book Now</button>
+            {/* Book Now button */}
+            <button style={styles.button} onClick={() => onBook(movie)}>
+                Book Now
+            </button>
         </div>
     );
 }
@@ -29,7 +32,7 @@ export default function MovieCard({ movie, onBook }) {
 const styles = {
     card: {
         width: "150px",
-        background: "#fff0f5",
+        background: "#b94f73",
         padding: "10px",
         borderRadius: "10px",
         textAlign: "center",
@@ -39,7 +42,9 @@ const styles = {
     },
     img: {
         width: "100%",
-        borderRadius: "5px"
+        borderRadius: "5px",
+        height: "225px",
+        objectFit: "cover"
     },
     button: {
         marginTop: "5px",

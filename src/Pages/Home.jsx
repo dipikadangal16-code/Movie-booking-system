@@ -1,61 +1,74 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import MovieCard from "../Components/MovieCard.jsx"
-import { collection, getDocs } from "firebase/firestore"
-import { db } from "../config/Firebase.js"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MovieCard from "../Components/MovieCard.jsx";
+import { movies as seedMovies } from "../Seed/SeedData.js";
 
 export default function Home() {
-  const [movies, setMovies] = useState([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const navigate = useNavigate()
+  // Only "now_showing" movies
+  const movies = seedMovies.filter(
+    (movie) => movie.status === "now_showing"
+  );
 
-  // Fetch movies from Firestore
-  useEffect(() => {
-    async function fetchMovies() {
-      const snapshot = await getDocs(collection(db, "movies"))
-      const movieList = snapshot.docs
-        .map(d => ({ id: d.id, ...d.data() }))
-        .filter(m => m.status === "now_showing") // Only now showing
-      setMovies(movieList)
-    }
-    fetchMovies()
-  }, [])
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
 
   const handlePrev = () =>
-    setCurrentIndex((prev) => (prev - 1 + movies.length) % movies.length)
+    setCurrentIndex(
+      (prev) => (prev - 1 + movies.length) % movies.length
+    );
+
   const handleNext = () =>
-    setCurrentIndex((prev) => (prev + 1) % movies.length)
+    setCurrentIndex(
+      (prev) => (prev + 1) % movies.length
+    );
 
   return (
     <div style={{ padding: "20px" }}>
       {/* Header */}
-      <h1 style={{ color: "#ff1493", textAlign: "center" }}>Welcome to CineBook</h1>
+      <h1 style={{ color: "#ff1493", textAlign: "center" }}>
+        Welcome to CineBook
+      </h1>
 
       {/* Now Showing Slider */}
       {movies.length === 0 ? (
-        <p style={{ textAlign: "center" }}>Loading movies...</p>
+        <p style={{ textAlign: "center" }}>No movies available</p>
       ) : (
         <>
-          <h2 style={{ color: "#ff1493", marginTop: "40px", textAlign: "center" }}>
+          <h2
+            style={{
+              color: "#ff1493",
+              marginTop: "40px",
+              textAlign: "center"
+            }}
+          >
             Now Showing
           </h2>
+
           <div style={styles.slider}>
-            <button style={styles.arrow} onClick={handlePrev}>&lt;</button>
+            <button style={styles.arrow} onClick={handlePrev}>
+              &lt;
+            </button>
+
             <div style={styles.cards}>
-              {movies.slice(currentIndex, currentIndex + 5).map(movie => (
-                <MovieCard
-                  key={movie.id}
-                  movie={movie}
-                  onBook={() => navigate(`/movie/${movie.id}`)} // Open movie details page
-                />
-              ))}
+              {movies
+                .slice(currentIndex, currentIndex + 5)
+                .map((movie) => (
+                  <MovieCard
+                    key={movie.id}
+                    movie={movie}
+                    onBook={() => navigate(`/movie/${movie.id}`)}
+                  />
+                ))}
             </div>
-            <button style={styles.arrow} onClick={handleNext}>&gt;</button>
+
+            <button style={styles.arrow} onClick={handleNext}>
+              &gt;
+            </button>
           </div>
         </>
       )}
     </div>
-  )
+  );
 }
 
 const styles = {
@@ -82,4 +95,4 @@ const styles = {
     border: "none",
     cursor: "pointer"
   }
-}
+};

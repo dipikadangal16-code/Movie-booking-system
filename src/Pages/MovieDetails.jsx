@@ -1,68 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-
-const API_KEY = "80d491707d8cf7b38aa19c7ccab0952f";
-const POSTER_BASE = "https://image.tmdb.org/t/p/w500";
+import { movies } from "../Seed/SeedData";
 
 export default function MovieDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const [movie, setMovie] = useState(null);
-    const [trailer, setTrailer] = useState("");
     const [selectedTheatre, setSelectedTheatre] = useState("");
     const [showDropdown, setShowDropdown] = useState(true);
     const [showtimes, setShowtimes] = useState([]);
 
-    /* ---------------- FETCH MOVIE DETAILS ---------------- */
+    /* -------- LOAD MOVIE FROM SEED DATA -------- */
     useEffect(() => {
-        async function fetchMovie() {
-            try {
-                const res = await fetch(
-                    `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US`
-                );
-                const data = await res.json();
-                setMovie(data);
-            } catch (err) {
-                console.error(err);
-            }
-        }
-        fetchMovie();
+        const foundMovie = movies.find((m) => m.id === id);
+        setMovie(foundMovie || null);
     }, [id]);
 
-    /* ---------------- FETCH TRAILER ---------------- */
-    useEffect(() => {
-        async function fetchTrailer() {
-            try {
-                const res = await fetch(
-                    `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`
-                );
-                const data = await res.json();
-
-                const trailerVideo = data.results?.find(
-                    (v) => v.type === "Trailer" && v.site === "YouTube"
-                );
-
-                if (trailerVideo) {
-                    setTrailer(
-                        `https://www.youtube.com/embed/${trailerVideo.key}?autoplay=1&mute=1`
-                    );
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-        fetchTrailer();
-    }, [id]);
-
-    /* ---------------- SHOWTIMES (STATIC) ---------------- */
+    /* -------- STATIC SHOWTIMES -------- */
     useEffect(() => {
         if (!selectedTheatre) return;
         setShowtimes(["10:00 AM", "1:00 PM", "4:00 PM", "7:00 PM"]);
     }, [selectedTheatre]);
 
-    if (!movie) return <p style={{ textAlign: "center" }}>Loading movie details...</p>;
+    if (!movie) {
+        return <p style={{ textAlign: "center" }}>Movie not found</p>;
+    }
 
     return (
         <div style={{ padding: "20px" }}>
@@ -74,7 +37,7 @@ export default function MovieDetails() {
 
                     {movie.poster_path && (
                         <img
-                            src={POSTER_BASE + movie.poster_path}
+                            src={movie.poster_path}
                             alt={movie.title}
                             style={styles.poster}
                         />
@@ -111,7 +74,10 @@ export default function MovieDetails() {
                                             state: {
                                                 movie,
                                                 theatre: { name: selectedTheatre },
-                                                showtime: { id: `${id}-${selectedTheatre}-${i}`, time }
+                                                showtime: {
+                                                    id: `${id}-${selectedTheatre}-${i}`,
+                                                    time
+                                                }
                                             }
                                         })
                                     }
@@ -138,9 +104,9 @@ export default function MovieDetails() {
 
                 {/* RIGHT SIDE – TRAILER */}
                 <div style={styles.right}>
-                    {trailer ? (
+                    {movie.trailer ? (
                         <iframe
-                            src={trailer}
+                            src={movie.trailer}
                             title="Movie Trailer"
                             allow="autoplay; encrypted-media"
                             allowFullScreen

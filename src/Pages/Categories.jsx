@@ -1,33 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MovieCard from "../Components/MovieCard.jsx";
+import { movies as seedMovies } from "../Seed/SeedData.js";
 
-const API_KEY = "80d491707d8cf7b38aa19c7ccab0952f";
-
+// Categories based on seedData genres
 const categories = [
-    { id: 28, name: "Action" },
-    { id: 35, name: "Comedy" },
-    { id: 27, name: "Horror" },
-    { id: 10749, name: "Romance" },
-    { id: 878, name: "Sci-Fi" },
-    { id: 53, name: "Thriller" },
+    "Action",
+    "Comedy",
+    "Horror",
+    "Romance",
+    "Sci-Fi",
+    "Thriller",
 ];
 
 export default function Categories() {
     const [selectedCategory, setSelectedCategory] = useState("");
-    const [movies, setMovies] = useState([]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!selectedCategory) return;
-
-        fetch(
-            `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${selectedCategory}`
+    // Local filtering
+    const filteredMovies = selectedCategory
+        ? seedMovies.filter(movie =>
+            movie.genre.includes(selectedCategory)
         )
-            .then(res => res.json())
-            .then(data => setMovies(data.results || []))
-            .catch(err => console.error(err));
-    }, [selectedCategory]);
+        : [];
 
     return (
         <div style={{ padding: 20 }}>
@@ -40,19 +35,23 @@ export default function Categories() {
                 >
                     <option value="">--Select Category--</option>
                     {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
+                        <option key={c} value={c}>{c}</option>
                     ))}
                 </select>
             </div>
 
             <div style={styles.grid}>
-                {movies.map(movie => (
-                    <MovieCard
-                        key={movie.id}
-                        movie={movie}
-                        onBook={() => navigate(`/movie/${movie.id}`)}
-                    />
-                ))}
+                {filteredMovies.length === 0 && selectedCategory ? (
+                    <p>No movies found</p>
+                ) : (
+                    filteredMovies.map(movie => (
+                        <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                            onBook={() => navigate(`/movie/${movie.id}`)}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );

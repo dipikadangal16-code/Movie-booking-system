@@ -19,6 +19,8 @@ import AdminShowtimes from "./Pages/AdminShowtimes.jsx";
 import AdminBooking from "./Pages/AdminBooking.jsx";
 import MovieDetails from "./Pages/MovieDetails.jsx";
 import Footer from "./Pages/Footer.jsx";
+import Movies from "./Pages/Movies.jsx";
+
 
 // Components
 import Navbar from "./Pages/Navbar.jsx";
@@ -64,6 +66,8 @@ export default function App() {
                     <Route path="/genre" element={<Genre />} />
                     <Route path="/categories" element={<Categories />} />
                     <Route path="/movie/:id" element={<MovieDetails />} />
+                    <Route path="/movies" element={<Movies />} />
+
 
                     {/* User Routes */}
                     <Route path="/dashboard" element={<UserDashboard />} />

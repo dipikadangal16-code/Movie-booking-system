@@ -1,8 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useState } from "react";
 
 export default function Navbar() {
-    const isLoggedIn = !!Cookies.get("uid");
+    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get("uid"));
+
+    const handleLogout = () => {
+        Cookies.remove("uid");
+        Cookies.remove("name");
+        Cookies.remove("token");
+        Cookies.remove("role");
+
+        setIsLoggedIn(false); // triggers UI update
+        navigate("/login");   // SPA-friendly navigation
+    };
 
     return (
         <nav style={styles.nav}>
@@ -15,19 +27,12 @@ export default function Navbar() {
                 <Link style={styles.link} to="/categories">Categories</Link>
                 <Link style={styles.link} to="/genre">Genre</Link>
                 <Link style={styles.link} to="/contact">Contact</Link>
-                <Link to="/movies">Movies</Link>
-                
+                <Link style={styles.link} to="/movies">Movies</Link>
 
                 {isLoggedIn ? (
                     <>
                         <Link style={styles.link} to="/profile">Profile</Link>
-                        <button style={styles.button} onClick={() => {
-                            Cookies.remove("uid");
-                            Cookies.remove("name");
-                            Cookies.remove("token");
-                            Cookies.remove("role");
-                            window.location.href = "/login";
-                        }}>Logout</button>
+                        <button style={styles.button} onClick={handleLogout}>Logout</button>
                     </>
                 ) : (
                     <Link style={styles.link} to="/login">Login</Link>
